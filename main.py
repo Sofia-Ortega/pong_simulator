@@ -38,12 +38,16 @@ def change_color(color):
 
 
 # -------------- VARIABLES -----------------
-x = 0
-y = 0
+x = 10
+y = 12
 
+vel_x = 1
+vel_y = 1
 
 paddle1_y = 0
 paddle2_y = 0
+
+score = 0
 
 
 def paddle1():
@@ -74,13 +78,28 @@ def hit_paddle1(x, y):
 def hit_paddle2(x, y):
   if  x != SCREEN_WIDTH - 1:
     return False
-  
+
   for i in range(PADDLE_SIZE):
     if y == paddle2_y + i:
       return True
     
   return False
 
+
+def hit_paddle(x, y):
+  return hit_paddle1(x, y) or hit_paddle2(x, y)
+
+def reset():
+  global x
+  global y
+  global vel_x
+  global vel_y
+
+  x = 10
+  y = 12
+
+  vel_x = 1
+  vel_y = 1
 
 
 while carryOn:
@@ -107,16 +126,32 @@ while carryOn:
 
   
   # ball
-  if keys[pygame.K_i] and y > 0:
-    y -= 1
-  elif keys[pygame.K_k] and y < SCREEN_HEIGHT - 1:
-    y += 1
+
+  # --- control ball with keys ---
+  # if keys[pygame.K_i] and y > 0:
+  #   y -= 1
+  # elif keys[pygame.K_k] and y < SCREEN_HEIGHT - 1:
+  #   y += 1
   
-  if keys[pygame.K_l] and x < SCREEN_WIDTH - 1:
-    x += 1
-  elif keys[pygame.K_j] and x > 0:
-    x -= 1
+  # if keys[pygame.K_l] and x < SCREEN_WIDTH - 1:
+  #   x += 1
+  # elif keys[pygame.K_j] and x > 0:
+  #   x -= 1
   
+  # ---- automatic ball movement -----
+  if y == 0 or y == SCREEN_HEIGHT - 1:
+    vel_y = -vel_y
+  if hit_paddle(x + vel_x, y + vel_y):
+    vel_x = -vel_x
+  
+  if x <= 0 or x >= SCREEN_WIDTH - 1:
+    print("LOSE: ", score)
+    reset()
+    score += 1
+
+
+  x += vel_x
+  y += vel_y
 
 
 
