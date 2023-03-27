@@ -41,17 +41,22 @@ def change_color(color):
 x = 0
 y = 0
 
-paddle_y = 0
+paddle1_y = 0
+paddle2_y = 0
 
-def paddleCoordinates():
-  arr = []
+
+def paddle1():
   for i in range(PADDLE_SIZE):
-    arr.append(paddle_y + i)
-
-  print(arr)
-  return arr 
+    rect(0, paddle1_y + i, RED)
 
 
+def paddle2():
+  for i in range(PADDLE_SIZE):
+    rect(SCREEN_WIDTH - 1, paddle2_y + i, RED)
+
+
+def ball():
+  rect(x, y, GREEN)
 
 
 while carryOn:
@@ -64,30 +69,16 @@ while carryOn:
   # ---- Game logic ------
   keys = pygame.key.get_pressed()
 
-  if keys[pygame.K_DOWN] and paddle_y < SCREEN_HEIGHT - PADDLE_SIZE - 1:
-    paddle_y += 1
-  elif keys[pygame.K_UP] and paddle_y > 0:
-    paddle_y -= 1
-  # ----- Move box with KEYS -------------
-  # if keys[pygame.K_RIGHT]:
-  #   color = change_color(color)
-  #   x += 1
-  # elif keys[pygame.K_LEFT]:
-  #   color = change_color(color)
-  #   x -= 1
-  # elif keys[pygame.K_UP]:
-  #   color = change_color(color)
-  #   y -= 1
-  # elif keys[pygame.K_DOWN]:
-  #   color = change_color(color)
-  #   y += 1
+  # up and down keys control RED paddle
+  if keys[pygame.K_s] and paddle1_y < SCREEN_HEIGHT - PADDLE_SIZE:
+    paddle1_y += 1
+  elif keys[pygame.K_w] and paddle1_y > 0:
+    paddle1_y -= 1
 
-
-  # drawing paddle
-  if y not in paddleCoordinates():
-    y = paddle_y
-  else:
-    y += 1
+  if keys[pygame.K_DOWN] and paddle2_y < SCREEN_HEIGHT - PADDLE_SIZE:
+    paddle2_y += 1
+  elif keys[pygame.K_UP] and paddle2_y > 0:
+    paddle2_y -= 1
 
   # ----- Drawing --------
 
@@ -95,7 +86,13 @@ while carryOn:
   screen.fill(BLACK)
 
   #  only one rect per refresh
-  rect(x, y, color)
+  # rect(x, y, color)
+
+  paddle1()
+  paddle2()
+
+  ball()
+
 
   pygame.display.update()
 
