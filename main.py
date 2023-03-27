@@ -10,8 +10,8 @@ GREEN = ( 0, 255, 0)
 RED = ( 255, 0, 0)
 
 SQUARE_SIZE = 30
-SCREEN_WIDTH = 24
-SCREEN_HEIGHT = 15
+SCREEN_WIDTH = 20 # 24
+SCREEN_HEIGHT = 15 # 15
 
 PADDLE_SIZE  = 3
 
@@ -47,7 +47,8 @@ vel_y = 1
 paddle1_y = 0
 paddle2_y = 0
 
-score = 0
+score1 = 0
+score2 = 0
 
 
 def paddle1():
@@ -144,10 +145,14 @@ while carryOn:
   if hit_paddle(x + vel_x, y + vel_y):
     vel_x = -vel_x
   
-  if x <= 0 or x >= SCREEN_WIDTH - 1:
-    print("LOSE: ", score)
+  if x <= 0:
+    print("Lose 1", score1)
+    score1 -= 1
     reset()
-    score += 1
+  if x >= SCREEN_WIDTH - 1:
+    print("Lose 2", score2)
+    score2 -= 1
+    reset()
 
 
   x += vel_x
