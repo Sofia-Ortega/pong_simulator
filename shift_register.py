@@ -1,30 +1,10 @@
-#              .';:cc;.
-#            .,',;lol::c.
-#            ;';lddddlclo
-#            lcloxxoddodxdool:,.
-#            cxdddxdodxdkOkkkkkkkd:.
-#          .ldxkkOOOOkkOO000Okkxkkkkx:.
-#        .lddxkkOkOOO0OOO0000Okxxxxkkkk:
-#       'ooddkkkxxkO0000KK00Okxdoodxkkkko
-#      .ooodxkkxxxOO000kkkO0KOxolooxkkxxkl
-#      lolodxkkxxkOx,.      .lkdolodkkxxxO.
-#      doloodxkkkOk           ....   .,cxO;
-#      ddoodddxkkkk:         ,oxxxkOdc'..o'
-#      :kdddxxxxd,  ,lolccldxxxkkOOOkkkko,
-#       lOkxkkk;  :xkkkkkkkkOOO000OOkkOOk.
-#        ;00Ok' 'O000OO0000000000OOOO0Od.
-#         .l0l.;OOO000000OOOOOO000000x,
-#            .'OKKKK00000000000000kc.
-#               .:ox0KKKKKKK0kdc,.
-#                      ...
 #
-# Author: peppe8o
-# Blog: https://peppe8o.com
-# Date: Nov 8th, 2020
-# Version: 1.0
+# Reference code was used from https://peppe8o.com
+#
 
 import RPi.GPIO as GPIO
 import sys
+import time
 
 # Define PINs according to cabling
 dataPINs = [5, 6, 13, 19, 26]
@@ -35,9 +15,14 @@ clockPIN = [21]
 xstring = "000000000000000000000000"
 ystring = "0000000000000000"
 
+LEDs = [[0 for i in range(16)] for j in range(24)]
+
+rowON = [0 for i in range(24)]
+columnOn = [0 for i in range(16)]
+
 #set pins to putput
 GPIO.setmode(GPIO.BCM)
-GPIO.setup((dataPINs[0], dataPINs[1], dataPINs[2], dataPINs[3], dataPINs[4],latchPIN,clockPIN),GPIO.OUT)
+GPIO.setup((dataPINs[0], dataPINs[1], dataPINs[2], dataPINs[3], dataPINs[4],latchPIN,clockPIN), GPIO.OUT)
 
 def all_shift(xinput, yinput, data, clock, latch):
   # Put latch down to start data sending
@@ -52,18 +37,15 @@ def all_shift(xinput, yinput, data, clock, latch):
     # These may need to be changed based on how they are shifted
 
     # Load x1
-    GPIO.output(data[0], int(xinput[i]))
+    GPIO.output(data[0], int(xinput[i]) ^ 1) # Negate because column supplies ground
     # Load x2
-    GPIO.output(data[1], int(xinput[8 + i]))
+    GPIO.output(data[1], int(xinput[8 + i]) ^ 1)
     # Load x3
-    GPIO.output(data[2], int(xinput[16 + i]))
+    GPIO.output(data[2], int(xinput[16 + i]) ^ 1)
     # Load y1
     GPIO.output(data[3], int(yinput[i]))
     # Load y2
-    if i == 7:
-      GPIO.output(data[4], 0)
-    else:
-      GPIO.output(data[4], int(yinput[8 + i]))
+    GPIO.output(data[4], int(yinput[8 + i]))
 
     GPIO.output(clock,1)
 
@@ -87,11 +69,22 @@ def updateStrings(xCoord, yCoord):
   xstring[xCoord] = '1'
   ystring[yCoord] = '1'
 
-# Main program, calling shift register function
-# Uses "sys.argv" to pass arguments from command line
-xinput = sys.argv[1]
-yinput = sys.argv[2]
-all_shift(xinput, yinput, dataPINs, clockPIN, latchPIN)
+# Main program, tests that shift registers can light all LEDs in sequential order
+all_shift(xstring, ystring, dataPINs, clockPIN, latchPIN)
+
+# for i in range(24):
+#   for j in range(16):
+#     updateStrings(i, j)
+#     all_shift(xstring, ystring, dataPINs, clockPIN, latchPIN)
+#     time.sleep(2)
+#     resetStrings()
+  
+for i in range(8):
+  for j in range(8):
+    updateStrings(i, j)
+    all_shift(xstring, ystring, dataPINs, clockPIN, latchPIN)
+    time.sleep(2)
+    resetStrings()
 
 #PINs final cleaning
 GPIO.cleanup()
